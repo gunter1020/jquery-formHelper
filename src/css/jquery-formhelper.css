@@ -1,0 +1,33 @@
+label.fh-file-select > span > i {
+  margin-right: 6px;
+}
+
+div.fh-file-block > span.fh-file-limit,
+div.fh-file-block > span.fh-file-unselect,
+div.fh-file-box > span.fh-file-info {
+  display: block;
+}
+
+div.fh-file-box > span.fh-file-info > i {
+  margin: 0px 6px;
+}
+
+div.fh-file-box {
+  position: relative;
+}
+
+div.fh-file-box > div.fh-file-toolbar {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+div.fh-file-box > div.fh-file-toolbar > span.fh-file-modify > i {
+  color: orange;
+  cursor: pointer;
+}
+
+div.fh-file-box > div.fh-file-toolbar > span.fh-file-remove > i {
+  color: red;
+  cursor: pointer;
+}
