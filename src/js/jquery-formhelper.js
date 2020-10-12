@@ -30,6 +30,19 @@
     };
 
     /**
+     * filePicker Exception
+     * 
+     * @param {String} code 
+     * @param {JQuery} $filePicker 
+     */
+    var filePickerException = function (code, $filePicker) {
+      this.code = code;
+      this.msg = lang[code];
+      this.$filePicker = $filePicker;
+      this.api = $filePicker.data('FilePicker');
+    };
+
+    /**
      * Get file picker template
      *
      * @param {*} config
@@ -188,15 +201,24 @@
      * @param {*} config
      */
     var filePickerChange = function (config) {
-      // tigger no files selected message display
+      var $fileSelect = config.$filePicker.find('.fh-file-select');
       var $unselectMsg = config.$filePicker.find('.fh-file-unselect');
+      var fileConut = getFileCount(config.$filePicker);
 
+      // tigger no files selected message display
       if ($unselectMsg.length) {
-        if (getFileCount(config.$filePicker)) {
+        if (fileConut) {
           $unselectMsg.hide();
         } else {
           $unselectMsg.show();
         }
+      }
+
+      // tigger file select button
+      if (fileConut >= config.maxFiles) {
+        $fileSelect.attr('disabled', true);
+      } else {
+        $fileSelect.attr('disabled', false);
       }
 
       // tigger change callback
@@ -356,6 +378,73 @@
       };
     };
 
+    /**
+     * Submit form
+     *
+     * @param {String} url
+     * @param {*} data
+     */
+    helper.submit = function (url, data = {}) {
+      try {
+        var totalSize = 0;
+
+        $.each($el.find('.fh-file-picker'), function () {
+          let $filePicker = $(this);
+
+          // continue undefined FilePicker
+          if (!$filePicker.data('FilePicker')) {
+            return;
+          }
+
+          totalSize = totalSize + getFileSize($filePicker);
+
+          // check upload file size
+          if (totalSize > options.filePicker.maxBytes) {
+            throw new filePickerException('fileSizeOverload', $filePicker);
+          }
+
+          // check upload file count
+          if (getFileCount($filePicker) > options.filePicker.maxFiles) {
+            throw new filePickerException('fileCountOverload', $filePicker);
+          }
+        });
+      } catch (filePickerError) {
+        // fail callback
+        if (typeof options.onFail === 'function') {
+          options.onFail(filePickerError.code, lang[filePickerError.code] || '');
+        } else {
+          throw filePickerError;
+        }
+        return;
+      }
+
+      // init FormData
+      var formData = new FormData($el.get(0));
+
+      // append custom data
+      if (!$.isEmptyObject(data)) {
+        $.each(data, function (name, value) {
+          if (Array.isArray(value)) {
+            value.map(function (item) {
+              formData.append(`${name}[]`, String(item));
+            });
+          } else {
+            formData.append(name, String(value));
+          }
+        });
+      }
+
+      return $.ajax({
+        url: url,
+        data: formData,
+        dataType: 'json',
+        processData: false,
+        contentType: false,
+        cache: false,
+        method: 'POST',
+      });
+    };
+
     return helper;
   };
 
@@ -383,6 +472,8 @@
       canRemove: true,
       canModify: true,
       container: false,
+      maxBytes: 10 * 1024 * 1024,
+      maxFiles: 10,
       onChange: false,
       fileInput: {
         name: 'files[]',
@@ -396,10 +487,15 @@
       unselectFile: 'No files selected.',
       limitMsg: 'File size limit (MB)',
       invalidMsg: 'File format not supported.',
+      fileSizeOverload: 'File size overload!',
+      fileCountOverload: 'File count overload!',
     },
     templates: {
       filePicker: false,
       fileBox: false,
+    },
+    onFail: function (errorCode, errorMsg) {
+      alert(`[${errorCode}]${errorMsg}`);
     },
   };
 });
