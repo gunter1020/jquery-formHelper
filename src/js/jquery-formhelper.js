@@ -183,6 +183,29 @@
     };
 
     /**
+     * FilePicker change event
+     *
+     * @param {*} config
+     */
+    var filePickerChange = function (config) {
+      // tigger no files selected message display
+      var $unselectMsg = config.$filePicker.find('.fh-file-unselect');
+
+      if ($unselectMsg.length) {
+        if (getFileCount(config.$filePicker)) {
+          $unselectMsg.hide();
+        } else {
+          $unselectMsg.show();
+        }
+      }
+
+      // tigger change callback
+      if (typeof config.onChange === 'function') {
+        config.onChange();
+      }
+    };
+
+    /**
      * Bind FilePicker event
      *
      * @param {JQuery} $filePicker
@@ -215,6 +238,9 @@
           });
 
           $fileList.append(getFileBoxTmpl(newConfig));
+
+          // tigger filePicker change
+          filePickerChange(newConfig);
         }
 
         // reset fileInputFake
@@ -229,16 +255,9 @@
      * @param {*} config
      */
     var bindFileBoxEvent = function ($fileBox, config) {
-      var $filePicker = config.$filePicker;
       var $fileInput = $fileBox.find('.fh-file-input');
       var $modifyIcon = $fileBox.find('.fh-file-modify');
       var $removeIcon = $fileBox.find('.fh-file-remove');
-      var $unselectMsg = $filePicker.find('.fh-file-unselect');
-
-      // tigger no files selected message display
-      var unselectFileCheck = function () {
-        return getFileCount($filePicker) ? $unselectMsg.hide() : $unselectMsg.show();
-      };
 
       // fileInput change render
       $fileInput.on('change', function () {
@@ -251,11 +270,11 @@
 
           // insert new fileBox after ori fileBox
           $fileBox.after(getFileBoxTmpl(newConfig)).remove();
-          // tigger message display
-          unselectFileCheck(newConfig);
+          // tigger filePicker change
+          filePickerChange(newConfig);
         } else {
-          // tigger message display
-          unselectFileCheck(config);
+          // tigger filePicker change
+          filePickerChange(config);
           // if not select files remove fileBox
           $fileBox.remove();
         }
@@ -269,8 +288,8 @@
       // remove fileBox
       $removeIcon.on('click', function () {
         $fileBox.remove();
-        // tigger message display
-        unselectFileCheck(config);
+        // tigger filePicker change
+        filePickerChange(config);
       });
     };
 
@@ -287,7 +306,32 @@
       // set parents filePicker
       config.$filePicker = getFilePickerTmpl(config);
 
-      return config.$filePicker.appendTo($(config.container || $el));
+      // set filePicker API
+      config.api = {
+        getSize: function (format = false) {
+          var size = getFileSize(config.$filePicker);
+          return format ? formatBytes(size) : size;
+        },
+        getCount: function () {
+          return getFileCount(config.$filePicker);
+        },
+        addFileBox: function (fileBoxOpt = {}) {
+          var $fileBox = getFileBoxTmpl($.extend(true, {}, config, fileBoxOpt));
+
+          config.$filePicker.find('.fh-file-list').append($fileBox);
+
+          // tigger filePicker change
+          filePickerChange(config);
+
+          return $fileBox;
+        },
+      };
+
+      $(config.container || $el).append(config.$filePicker);
+
+      config.$filePicker.data('FilePicker', config.api);
+
+      return config.api;
     };
 
     /**
@@ -339,6 +383,7 @@
       canRemove: true,
       canModify: true,
       container: false,
+      onChange: false,
       fileInput: {
         name: 'files[]',
         accept: '',

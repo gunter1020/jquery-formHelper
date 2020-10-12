@@ -38,6 +38,14 @@
             accept: '',
             multiple: false,
           },
+          onChange: function () {
+            var total = formhelper.getFilePickerInfo();
+            var totalText = ['Total', 'count: ' + total.count, 'size: ' + total.sizeHum];
+            var selfText = ['Demo1', 'count: ' + fileDemo1.getCount(), 'size: ' + fileDemo1.getSize(true)];
+
+            $('.ctrl-filepicker-total').text(totalText.join(' | '));
+            $('.ctrl-filepicker-demo1').text(selfText.join(' | '));
+          },
         });
 
         var fileDemo2 = formhelper.addFilePicker({
@@ -48,11 +56,22 @@
             accept: 'image/*',
             multiple: true,
           },
+          onChange: function () {
+            var total = formhelper.getFilePickerInfo();
+            var totalText = ['Total', 'count: ' + total.count, 'size: ' + total.sizeHum];
+            var selfText = ['Demo2', 'count: ' + fileDemo2.getCount(), 'size: ' + fileDemo2.getSize(true)];
+
+            $('.ctrl-filepicker-total').text(totalText.join(' | '));
+            $('.ctrl-filepicker-demo2').text(selfText.join(' | '));
+          },
         });
       });
     </script>
   </head>
   <body>
+    <div class="ctrl-filepicker-demo1">&nbsp;</div>
+    <div class="ctrl-filepicker-demo2">&nbsp;</div>
+    <div class="ctrl-filepicker-total">&nbsp;</div>
     <form class="ctrl-demo"></form>
   </body>
 </html>
