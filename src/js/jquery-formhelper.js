@@ -228,6 +228,30 @@
     };
 
     /**
+     * FileBox create event
+     *
+     * @param {*} config
+     */
+    var fileBoxCreate = function (config) {
+      // tigger create callback
+      if (typeof config.onCreate === 'function') {
+        config.onCreate();
+      }
+    };
+
+    /**
+     * FileBox remove event
+     *
+     * @param {*} config
+     */
+    var fileBoxRemove = function (config) {
+      // tigger remove callback
+      if (typeof config.onRemove === 'function') {
+        config.onRemove();
+      }
+    };
+
+    /**
      * Bind FilePicker event
      *
      * @param {JQuery} $filePicker
@@ -260,6 +284,9 @@
           });
 
           $fileList.append(getFileBoxTmpl(newConfig));
+
+          // tigger fileBox create
+          fileBoxCreate(newConfig);
 
           // tigger filePicker change
           filePickerChange(newConfig);
@@ -295,6 +322,8 @@
           // tigger filePicker change
           filePickerChange(newConfig);
         } else {
+          // tigger fileBox remove
+          fileBoxRemove(config);
           // tigger filePicker change
           filePickerChange(config);
           // if not select files remove fileBox
@@ -310,6 +339,8 @@
       // remove fileBox
       $removeIcon.on('click', function () {
         $fileBox.remove();
+        // tigger fileBox remove
+        fileBoxRemove(config);
         // tigger filePicker change
         filePickerChange(config);
       });
@@ -341,6 +372,9 @@
           var $fileBox = getFileBoxTmpl($.extend(true, {}, config, fileBoxOpt));
 
           config.$filePicker.find('.fh-file-list').append($fileBox);
+
+          // tigger fileBox create
+          fileBoxCreate(newConfig);
 
           // tigger filePicker change
           filePickerChange(config);
@@ -475,6 +509,8 @@
       maxBytes: 10 * 1024 * 1024,
       maxFiles: 10,
       onChange: false,
+      onCreate: false,
+      onRemove: false,
       fileInput: {
         name: 'files[]',
         accept: '',
