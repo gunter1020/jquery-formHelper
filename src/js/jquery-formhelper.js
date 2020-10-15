@@ -413,12 +413,9 @@
     };
 
     /**
-     * Submit form
-     *
-     * @param {String} url
-     * @param {*} data
+     * Check form
      */
-    helper.submit = function (url, data = {}) {
+    helper.check = function () {
       try {
         var totalSize = 0;
 
@@ -449,6 +446,20 @@
         } else {
           throw filePickerError;
         }
+        return false;
+      }
+      return true;
+    };
+
+    /**
+     * Submit form
+     *
+     * @param {String} url
+     * @param {*} data
+     */
+    helper.submit = function (url, data = {}) {
+      // check form data
+      if (!this.check()) {
         return;
       }
 
