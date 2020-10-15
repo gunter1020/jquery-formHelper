@@ -31,9 +31,9 @@
 
     /**
      * filePicker Exception
-     * 
-     * @param {String} code 
-     * @param {JQuery} $filePicker 
+     *
+     * @param {String} code
+     * @param {JQuery} $filePicker
      */
     var filePickerException = function (code, $filePicker) {
       this.code = code;
