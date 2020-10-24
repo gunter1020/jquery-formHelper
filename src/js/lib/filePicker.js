@@ -83,7 +83,7 @@ export var filePicker = function ($el, options) {
             .attr({
               type: 'file',
               name: config.fileInput.name,
-              accept: config.fileInput.accept,
+              accept: config.fileInput.accept.join(','),
               multiple: config.fileInput.multiple,
             })
             .addClass('fh-file-input')
@@ -235,7 +235,7 @@ export var filePicker = function ($el, options) {
     var $fileSelect = $filePicker.find('.fh-file-select');
     var $fileInputFake = $('<input>').attr({
       type: 'file',
-      accept: config.fileInput.accept,
+      accept: config.fileInput.accept.join(','),
       multiple: config.fileInput.multiple,
     });
 
@@ -340,6 +340,11 @@ export var filePicker = function ($el, options) {
   this.addPicker = function (config = {}) {
     // init filePicker config
     config = $.extend(true, {}, options.filePicker, config);
+
+    // format fileInput accept type
+    config.fileInput.accept = Array.isArray(config.fileInput.accept)
+      ? config.fileInput.accept
+      : config.fileInput.accept.split(',');
 
     // set filePicker element
     config.$filePicker = getFilePickerTmpl(config);

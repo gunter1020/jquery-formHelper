@@ -156,7 +156,7 @@ import { filePicker } from './lib/filePicker.js';
       onRemove: false,
       fileInput: {
         name: 'files[]',
-        accept: '',
+        accept: [],
         multiple: false,
       },
     },
