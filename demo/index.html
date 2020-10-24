@@ -35,7 +35,7 @@
           canModify: false,
           fileInput: {
             name: 'fileDemo1[]',
-            accept: '',
+            accept: [],
             multiple: false,
           },
           onChange: function () {
@@ -53,7 +53,7 @@
           canModify: true,
           fileInput: {
             name: 'fileDemo2[]',
-            accept: 'image/*',
+            accept: ['image/*', '.pdf', '.doc', '.docx', '.xml', 'application/msword'],
             multiple: true,
           },
           onChange: function () {
@@ -64,6 +64,25 @@
             $('.ctrl-filepicker-total').text(totalText.join(' | '));
             $('.ctrl-filepicker-demo2').text(selfText.join(' | '));
           },
+        });
+
+        // add static file
+        fileDemo1.addFileBox({
+          inputs: [
+            {name: 'hideValue', value: 'demo'}
+          ],
+          files: [
+            {
+              name: 'Gunter.png',
+              size: 11179,
+              link: 'https://static.wikia.nocookie.net/adventuretimewithfinnandjake/images/6/68/Gunter.png',
+            },
+            {
+              name: 'Orgalorg.png',
+              size: 356745,
+              link: '',
+            },
+          ],
         });
       });
     </script>
