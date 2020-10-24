@@ -196,7 +196,7 @@ export var filePicker = function ($el, options) {
 
     // tigger change callback
     if (typeof config.onChange === 'function') {
-      config.onChange();
+      config.onChange(config);
     }
   };
 
@@ -208,7 +208,7 @@ export var filePicker = function ($el, options) {
   var fileBoxCreate = function (config) {
     // tigger create callback
     if (typeof config.onCreate === 'function') {
-      config.onCreate();
+      config.onCreate(config);
     }
   };
 
@@ -220,7 +220,7 @@ export var filePicker = function ($el, options) {
   var fileBoxRemove = function (config) {
     // tigger remove callback
     if (typeof config.onRemove === 'function') {
-      config.onRemove();
+      config.onRemove(config);
     }
   };
 
@@ -357,16 +357,18 @@ export var filePicker = function ($el, options) {
         return getFileCount(config.$filePicker);
       },
       addFileBox: function (fileBoxOpt = {}) {
-        var $fileBox = getFileBoxTmpl($.extend(true, {}, config, fileBoxOpt));
+        fileBoxOpt = $.extend(true, {}, config, fileBoxOpt);
+
+        var $fileBox = getFileBoxTmpl(fileBoxOpt);
 
         // insert into filePicker list block
         $fileList.append($fileBox);
 
         // tigger fileBox create
-        fileBoxCreate(newConfig);
+        fileBoxCreate(fileBoxOpt);
 
         // tigger filePicker change
-        filePickerChange(config);
+        filePickerChange(fileBoxOpt);
 
         return $fileBox;
       },
