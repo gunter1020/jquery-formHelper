@@ -101,7 +101,7 @@ export var filePicker = function ($el, options) {
       if (config.files && config.files.length) {
         // add select files info text
         $.each(config.files, function (idx, file) {
-          let $fileInfo = $('<span>').addClass('fh-file-info');
+          let $fileInfo = $('<span>').addClass('fh-file-info').data(file);
           let fileText = `${file.name} (${formatBytes(file.size)})`;
 
           // set download link
@@ -140,7 +140,23 @@ export var filePicker = function ($el, options) {
   };
 
   /**
-   * Get file size by filePicker
+   * Get file Info by FilePicker
+   *
+   * @param {JQuery} $filePicker
+   * @returns {Array}
+   */
+  var getFileInfo = function ($filePicker) {
+    var files = [];
+
+    $.each($filePicker.find('.fh-file-info'), function () {
+      files.push($(this).data());
+    });
+
+    return files;
+  };
+
+  /**
+   * Get file size by FilePicker
    *
    * @param {JQuery} $filePicker
    * @returns {Number}
@@ -148,29 +164,21 @@ export var filePicker = function ($el, options) {
   var getFileSize = function ($filePicker) {
     var fileSize = 0;
 
-    $.each($filePicker.find('.fh-file-input'), function () {
-      $.each($(this).prop('files'), function (idx, file) {
-        fileSize = fileSize + file.size;
-      });
+    $.each(getFileInfo($filePicker), function (idx, file) {
+      fileSize = fileSize + file.size;
     });
 
     return fileSize;
   };
 
   /**
-   * Get file count by filePicker
+   * Get file count by FilePicker
    *
    * @param {JQuery} $filePicker
    * @returns {Number}
    */
   var getFileCount = function ($filePicker) {
-    var fileCount = 0;
-
-    $.each($filePicker.find('.fh-file-input'), function () {
-      fileCount = fileCount + $(this).prop('files').length;
-    });
-
-    return fileCount;
+    return getFileInfo($filePicker).length;
   };
 
   /**
