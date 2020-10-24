@@ -16,6 +16,15 @@ div.fh-file-box {
   position: relative;
 }
 
+div.fh-file-box > span.fh-file-info > a[href=''] {
+  color: rgb(255, 0, 0);
+  cursor: not-allowed;
+}
+
+div.fh-file-box > span.fh-file-info > a[href='']:active {
+  pointer-events: none;
+}
+
 div.fh-file-box > div.fh-file-toolbar {
   position: absolute;
   top: 0px;

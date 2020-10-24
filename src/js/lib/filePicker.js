@@ -101,12 +101,17 @@ export var filePicker = function ($el, options) {
       if (config.files && config.files.length) {
         // add select files info text
         $.each(config.files, function (idx, file) {
-          $fileBox.append(
-            $('<span>')
-              .addClass('fh-file-info')
-              .text(`${file.name} (${formatBytes(file.size)})`)
-              .prepend($('<i>').addClass('far fa-file fa-fw'))
-          );
+          let $fileInfo = $('<span>').addClass('fh-file-info');
+          let fileText = `${file.name} (${formatBytes(file.size)})`;
+
+          // set download link
+          if ('link' in file) {
+            $fileInfo.append($('<a>').attr({ href: file.link, target: '_blank' }).text(fileText));
+          } else {
+            $fileInfo.text(fileText);
+          }
+
+          $fileBox.append($fileInfo.prepend($('<i>').addClass('far fa-file fa-fw')));
         });
       } else {
         // add selecting file prompt text
