@@ -389,7 +389,7 @@ export var filePicker = function ($el, options) {
   /**
    * Get FilePicker info
    */
-  this.getAllInfo = function () {
+  this.getAllInfo = function ($ele) {
     var info = {
       size: 0,
       sizeHum: '',
@@ -397,7 +397,7 @@ export var filePicker = function ($el, options) {
       picker: [],
     };
 
-    $.each($el.find('.fh-file-picker'), function () {
+    $.each($ele.find('.fh-file-picker'), function () {
       let $filePicker = $(this);
 
       // continue undefined FilePicker
@@ -425,8 +425,8 @@ export var filePicker = function ($el, options) {
   /**
    * Check FilePicker limit
    */
-  this.check = function () {
-    var info = this.getAllInfo();
+  this.check = function ($ele) {
+    var info = this.getAllInfo($ele);
 
     // check upload file size
     if (info.totalSize > options.filePicker.maxBytes) {
