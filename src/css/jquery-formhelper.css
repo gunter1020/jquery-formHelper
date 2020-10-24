@@ -28,6 +28,7 @@ div.fh-file-box > span.fh-file-info > i {
 
 div.fh-file-box {
   position: relative;
+  background-color: gainsboro;
 }
 
 div.fh-file-box > span.fh-file-info > a[href=''] {
