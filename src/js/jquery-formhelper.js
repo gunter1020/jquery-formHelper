@@ -75,8 +75,10 @@ import { filePicker } from './lib/filePicker.js';
      * @param {String} url
      * @param {*} data
      * @param {HTMLFormElement} formEle
+     * @returns {Promise}
      */
     helper.submit = function (url, data = {}, formEle = undefined) {
+      var dfr = $.Deferred();
       var $formEle = getEl(formEle);
 
       // check form data
@@ -97,7 +99,7 @@ import { filePicker } from './lib/filePicker.js';
           });
         }
 
-        return $.ajax({
+        $.ajax({
           url: url,
           data: formData,
           dataType: 'json',
@@ -105,8 +107,12 @@ import { filePicker } from './lib/filePicker.js';
           contentType: false,
           cache: false,
           method: 'POST',
-        });
+        })
+          .done(dfr.resolve)
+          .fail(dfr.reject);
       }
+
+      return dfr.promise();
     };
 
     return helper;
