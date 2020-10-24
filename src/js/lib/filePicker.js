@@ -394,9 +394,10 @@ export var filePicker = function ($el, options) {
 
     $.each($ele.find('.fh-file-picker'), function () {
       let $filePicker = $(this);
+      let filePickerAPI = $filePicker.data('FilePicker');
 
       // continue undefined FilePicker
-      if (!$filePicker.data('FilePicker')) {
+      if (!filePickerAPI) {
         return;
       }
 
@@ -406,7 +407,7 @@ export var filePicker = function ($el, options) {
       info.size += size;
       info.count += count;
       info.picker.push({
-        $filePicker: $filePicker,
+        api: filePickerAPI,
         size: size,
         count: count,
       });
