@@ -200,7 +200,10 @@ export var filePicker = function ($el, options) {
   var filePickerChange = function (config) {
     var $fileSelect = config.$filePicker.find('.fh-file-select');
     var $unselectMsg = config.$filePicker.find('.fh-file-unselect');
+    var fileSize = getFileSize(config.$filePicker);
     var fileConut = getFileCount(config.$filePicker);
+
+    var fileSelectDisable = fileSize >= config.maxBytes || fileConut >= config.maxFiles;
 
     // tigger no files selected message display
     if ($unselectMsg.length) {
@@ -212,11 +215,7 @@ export var filePicker = function ($el, options) {
     }
 
     // tigger file select button
-    if (fileConut >= config.maxFiles) {
-      $fileSelect.attr('disabled', true);
-    } else {
-      $fileSelect.attr('disabled', false);
-    }
+    $fileSelect.attr('disabled', fileSelectDisable);
 
     // tigger change callback
     if (typeof config.onChange === 'function') {
