@@ -165,7 +165,6 @@ import { filePicker } from './lib/filePicker.js';
       selectingFile: 'Selecting files...',
       unselectFile: 'No files selected.',
       limitMsg: 'File size limit (MB)',
-      invalidMsg: 'File format not supported.',
       fileSizeOverload: 'File size overload!',
       fileCountOverload: 'File count overload!',
     },

@@ -74,9 +74,7 @@ export var filePicker = function ($el, options) {
     } else {
       var toolbar = [];
 
-      $fileBox = $('<div>')
-        .addClass('fh-file-box')
-        .css('background-color', config.isInvalid ? '#FCDEDE' : '#F5F5F5');
+      $fileBox = $('<div>').addClass('fh-file-box');
 
       // add file input
       if (config.$fileInput) {
@@ -113,11 +111,6 @@ export var filePicker = function ($el, options) {
       } else {
         // add selecting file prompt text
         $fileBox.append($('<span>').addClass('fh-file-info').text(lang.selectingFile));
-      }
-
-      // add invalid message
-      if (config.isInvalid) {
-        $fileBox.append($('<em>').text(options.language.invalidMsg));
       }
 
       // create modify icon
