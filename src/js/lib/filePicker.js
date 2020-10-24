@@ -36,6 +36,16 @@ export var filePicker = function ($el, options) {
     } else if (options.templates.filePicker) {
       $filePicker = $(options.templates.filePicker);
     } else {
+      var acceptTag = [];
+      $.each(config.fileInput.accept, function (idx, accept) {
+        acceptTag.push($('<span>').addClass('fh-accept-tag').text(accept).prop('outerHTML'));
+      });
+
+      var acceptMsg = acceptTag.length
+        ? $('<span>').text(lang.acceptMsg).prop('innerHTML').replace('{0}', acceptTag.join(''))
+        : '';
+      var limitMsg = lang.limitMsg.replace('{0}', formatBytes(config.maxBytes)).replace('{1}', config.maxFiles);
+
       $filePicker = $('<div>')
         .addClass('fh-file-picker')
         .append(
@@ -47,7 +57,8 @@ export var filePicker = function ($el, options) {
         .append(
           $('<div>')
             .addClass('fh-file-block')
-            .append($('<span>').addClass('fh-file-limit').text(lang.limitMsg))
+            .append($('<span>').addClass('fh-file-accept').html(acceptMsg))
+            .append($('<span>').addClass('fh-file-limit').text(limitMsg))
             .append($('<span>').addClass('fh-file-unselect').text(lang.unselectFile))
             .append($('<div>').addClass('fh-file-list'))
         );
