@@ -295,12 +295,12 @@ export var filePicker = function ($el, options) {
         // tigger filePicker change
         filePickerChange(newConfig);
       } else {
+        // if not select files remove fileBox
+        $fileBox.remove();
         // tigger fileBox remove
         fileBoxRemove(config);
         // tigger filePicker change
         filePickerChange(config);
-        // if not select files remove fileBox
-        $fileBox.remove();
       }
     });
 
