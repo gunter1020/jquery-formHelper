@@ -259,13 +259,11 @@ export var filePicker = function ($el, options) {
 
     // fileInputFake change render
     $fileInputFake.on('change.formhelper', function () {
-      var files = $fileInputFake.prop('files');
-
       // if have select file
-      if (files.length > 0) {
+      if (this.files.length > 0) {
         // create new file box
         var newConfig = $.extend(true, {}, config, {
-          files: files,
+          files: this.files,
           $fileInput: $fileInputFake.clone(),
         });
 
@@ -297,9 +295,9 @@ export var filePicker = function ($el, options) {
     // fileInput change render
     $fileInput.on('change', function () {
       // if have select file
-      if ($fileInput.prop('files').length > 0) {
+      if (this.files.length > 0) {
         var newConfig = $.extend(true, {}, config, {
-          files: $fileInput.prop('files'),
+          files: this.files,
           $fileInput: $fileInput.clone(),
         });
 
