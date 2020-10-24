@@ -349,12 +349,18 @@ export var filePicker = function ($el, options) {
 
     // set filePicker API
     config.api = {
+      getEl: function () {
+        return config.$filePicker;
+      },
       getSize: function (format = false) {
         var size = getFileSize(config.$filePicker);
         return format ? formatBytes(size) : size;
       },
       getCount: function () {
         return getFileCount(config.$filePicker);
+      },
+      getConfig: function () {
+        return config;
       },
       addFileBox: function (fileBoxOpt = {}) {
         fileBoxOpt = $.extend(true, {}, config, fileBoxOpt);
