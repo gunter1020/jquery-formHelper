@@ -145,6 +145,8 @@ import { filePicker } from './lib/filePicker.js';
    * jQuery defaults object
    */
   $.fn.formhelper.defaults = {
+    maxBytes: 20 * 1024 * 1024,
+    maxFiles: 20,
     filePicker: {
       canRemove: true,
       canModify: true,
@@ -165,8 +167,8 @@ import { filePicker } from './lib/filePicker.js';
       selectingFile: 'Selecting files...',
       unselectFile: 'No files selected.',
       limitMsg: 'File size limit (MB)',
-      fileSizeOverload: 'File size overload!',
-      fileCountOverload: 'File count overload!',
+      fileSizeOverload: 'File size overload! limit size: {1}',
+      fileCountOverload: 'File count overload! limit count: {1}',
     },
     templates: {
       filePicker: false,

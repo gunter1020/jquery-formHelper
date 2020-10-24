@@ -320,14 +320,25 @@ export var filePicker = function ($el, options) {
   };
 
   /**
+   * Build Exception message
+   *
+   * @param {String} code
+   * @param {String} param
+   */
+  var buildExceptionMsg = function (code, param) {
+    return (lang[code] || '').replace('{0}', code).replace('{1}', param);
+  };
+
+  /**
    * FilePicker Exception
    *
    * @param {String} code
+   * @param {String} param
    * @param {JQuery} $filePicker
    */
-  var filePickerException = function (code, $filePicker) {
+  var filePickerException = function (code, param, $filePicker) {
     this.code = code;
-    this.msg = lang[code] || '';
+    this.msg = buildExceptionMsg(code, param);
     this.$el = $filePicker || $el;
     this.api = this.$el.data('FilePicker') || {};
   };
@@ -435,15 +446,25 @@ export var filePicker = function ($el, options) {
   this.check = function ($ele) {
     var info = this.getAllInfo($ele);
 
-    // check upload file size
-    if (info.totalSize > options.filePicker.maxBytes) {
-      throw new filePickerException('fileSizeOverload');
+    // check all upload file size
+    if (info.size > options.maxBytes) {
+      throw new filePickerException('fileSizeOverload', formatBytes(options.maxBytes), $ele);
     }
 
-    // check upload file count
+    // check all upload file count
+    if (info.count > options.maxFiles) {
+      throw new filePickerException('fileCountOverload', options.maxFiles, $ele);
+    }
+
     $.each(info.picker, function (idx, picker) {
-      if (picker.count > options.filePicker.maxFiles) {
-        throw new filePickerException('fileCountOverload', picker.$filePicker);
+      let pickerConfig = picker.api.getConfig();
+      // check picker upload file size
+      if (picker.size > pickerConfig.maxBytes) {
+        throw new filePickerException('fileSizeOverload', formatBytes(pickerConfig.maxBytes), picker.$filePicker);
+      }
+      // check picker upload file count
+      if (picker.count > pickerConfig.maxFiles) {
+        throw new filePickerException('fileCountOverload', pickerConfig.maxFiles, picker.$filePicker);
       }
     });
   };
