@@ -8,12 +8,36 @@ div.fh-file-box > span.fh-file-info {
   display: block;
 }
 
+div.fh-file-block > .fh-file-accept > .fh-accept-tag {
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: baseline;
+  text-align: center;
+  margin: 0rem 0.1rem;
+  padding: 0rem .25rem;
+  border-radius: .25rem;
+  font-size: .75rem;
+  font-weight: bold;
+  background-color: gray;
+  color: white;
+}
+
 div.fh-file-box > span.fh-file-info > i {
   margin: 0px 6px;
 }
 
 div.fh-file-box {
   position: relative;
+  background-color: gainsboro;
+}
+
+div.fh-file-box > span.fh-file-info > a[href=''] {
+  color: rgb(255, 0, 0);
+  cursor: not-allowed;
+}
+
+div.fh-file-box > span.fh-file-info > a[href='']:active {
+  pointer-events: none;
 }
 
 div.fh-file-box > div.fh-file-toolbar {
@@ -30,4 +54,8 @@ div.fh-file-box > div.fh-file-toolbar > span.fh-file-modify > i {
 div.fh-file-box > div.fh-file-toolbar > span.fh-file-remove > i {
   color: red;
   cursor: pointer;
+}
+
+.fh-file-invalid {
+  background-color: #FCDEDE;
 }

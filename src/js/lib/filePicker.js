@@ -36,6 +36,16 @@ export var filePicker = function ($el, options) {
     } else if (options.templates.filePicker) {
       $filePicker = $(options.templates.filePicker);
     } else {
+      var acceptTag = [];
+      $.each(config.fileInput.accept, function (idx, accept) {
+        acceptTag.push($('<span>').addClass('fh-accept-tag').text(accept).prop('outerHTML'));
+      });
+
+      var acceptMsg = acceptTag.length
+        ? $('<span>').text(lang.acceptMsg).prop('innerHTML').replace('{0}', acceptTag.join(''))
+        : '';
+      var limitMsg = lang.limitMsg.replace('{0}', formatBytes(config.maxBytes)).replace('{1}', config.maxFiles);
+
       $filePicker = $('<div>')
         .addClass('fh-file-picker')
         .append(
@@ -47,10 +57,12 @@ export var filePicker = function ($el, options) {
         .append(
           $('<div>')
             .addClass('fh-file-block')
-            .append($('<span>').addClass('fh-file-limit').text(lang.limitMsg))
+            .append($('<span>').addClass('fh-file-accept').html(acceptMsg))
+            .append($('<span>').addClass('fh-file-limit').text(limitMsg))
             .append($('<span>').addClass('fh-file-unselect').text(lang.unselectFile))
             .append($('<div>').addClass('fh-file-list'))
-        );
+        )
+        .append($('<div>').addClass('fh-file-msg'));
     }
 
     bindFilePickerEvent($filePicker, config);
@@ -74,9 +86,7 @@ export var filePicker = function ($el, options) {
     } else {
       var toolbar = [];
 
-      $fileBox = $('<div>')
-        .addClass('fh-file-box')
-        .css('background-color', config.isInvalid ? '#FCDEDE' : '#F5F5F5');
+      $fileBox = $('<div>').addClass('fh-file-box');
 
       // add file input
       if (config.$fileInput) {
@@ -85,7 +95,7 @@ export var filePicker = function ($el, options) {
             .attr({
               type: 'file',
               name: config.fileInput.name,
-              accept: config.fileInput.accept,
+              accept: config.fileInput.accept.join(','),
               multiple: config.fileInput.multiple,
             })
             .addClass('fh-file-input')
@@ -103,21 +113,21 @@ export var filePicker = function ($el, options) {
       if (config.files && config.files.length) {
         // add select files info text
         $.each(config.files, function (idx, file) {
-          $fileBox.append(
-            $('<span>')
-              .addClass('fh-file-info')
-              .text(`${file.name} (${formatBytes(file.size)})`)
-              .prepend($('<i>').addClass('far fa-file fa-fw'))
-          );
+          let $fileInfo = $('<span>').addClass('fh-file-info').data(file);
+          let fileText = `${file.name} (${formatBytes(file.size)})`;
+
+          // set download link
+          if ('link' in file) {
+            $fileInfo.append($('<a>').attr({ href: file.link, target: '_blank' }).text(fileText));
+          } else {
+            $fileInfo.text(fileText);
+          }
+
+          $fileBox.append($fileInfo.prepend($('<i>').addClass('far fa-file fa-fw')));
         });
       } else {
         // add selecting file prompt text
         $fileBox.append($('<span>').addClass('fh-file-info').text(lang.selectingFile));
-      }
-
-      // add invalid message
-      if (config.isInvalid) {
-        $fileBox.append($('<em>').text(options.language.invalidMsg));
       }
 
       // create modify icon
@@ -142,7 +152,23 @@ export var filePicker = function ($el, options) {
   };
 
   /**
-   * Get file size by filePicker
+   * Get file Info by FilePicker
+   *
+   * @param {JQuery} $filePicker
+   * @returns {Array}
+   */
+  var getFileInfo = function ($filePicker) {
+    var files = [];
+
+    $.each($filePicker.find('.fh-file-info'), function () {
+      files.push($(this).data());
+    });
+
+    return files;
+  };
+
+  /**
+   * Get file size by FilePicker
    *
    * @param {JQuery} $filePicker
    * @returns {Number}
@@ -150,29 +176,21 @@ export var filePicker = function ($el, options) {
   var getFileSize = function ($filePicker) {
     var fileSize = 0;
 
-    $.each($filePicker.find('.fh-file-input'), function () {
-      $.each($(this).prop('files'), function (idx, file) {
-        fileSize = fileSize + file.size;
-      });
+    $.each(getFileInfo($filePicker), function (idx, file) {
+      fileSize = fileSize + file.size;
     });
 
     return fileSize;
   };
 
   /**
-   * Get file count by filePicker
+   * Get file count by FilePicker
    *
    * @param {JQuery} $filePicker
    * @returns {Number}
    */
   var getFileCount = function ($filePicker) {
-    var fileCount = 0;
-
-    $.each($filePicker.find('.fh-file-input'), function () {
-      fileCount = fileCount + $(this).prop('files').length;
-    });
-
-    return fileCount;
+    return getFileInfo($filePicker).length;
   };
 
   /**
@@ -181,9 +199,15 @@ export var filePicker = function ($el, options) {
    * @param {*} config
    */
   var filePickerChange = function (config) {
+    var $fileMsg = config.$filePicker.find('.fh-file-msg');
     var $fileSelect = config.$filePicker.find('.fh-file-select');
     var $unselectMsg = config.$filePicker.find('.fh-file-unselect');
+    var fileSize = getFileSize(config.$filePicker);
     var fileConut = getFileCount(config.$filePicker);
+
+    var isOverSize = fileSize > config.maxBytes;
+    var isOverLoad = fileConut > config.maxFiles;
+    var fileSelectDisable = fileSize >= config.maxBytes || fileConut >= config.maxFiles;
 
     // tigger no files selected message display
     if ($unselectMsg.length) {
@@ -195,15 +219,30 @@ export var filePicker = function ($el, options) {
     }
 
     // tigger file select button
-    if (fileConut >= config.maxFiles) {
-      $fileSelect.attr('disabled', true);
-    } else {
-      $fileSelect.attr('disabled', false);
+    $fileSelect.attr('disabled', fileSelectDisable);
+
+    // clean filePicker invalid message
+    $fileMsg.empty();
+
+    // add file size invalid message
+    if (isOverSize) {
+      $fileMsg.append(
+        $('<div>')
+          .addClass('fh-file-invalid')
+          .text(buildExceptionMsg('fileSizeOverload', formatBytes(config.maxBytes)))
+      );
+    }
+
+    // add file count invalid message
+    if (isOverLoad) {
+      $fileMsg.append(
+        $('<div>').addClass('fh-file-invalid').text(buildExceptionMsg('fileCountOverload', config.maxFiles))
+      );
     }
 
     // tigger change callback
     if (typeof config.onChange === 'function') {
-      config.onChange();
+      config.onChange(config);
     }
   };
 
@@ -215,7 +254,7 @@ export var filePicker = function ($el, options) {
   var fileBoxCreate = function (config) {
     // tigger create callback
     if (typeof config.onCreate === 'function') {
-      config.onCreate();
+      config.onCreate(config);
     }
   };
 
@@ -227,7 +266,7 @@ export var filePicker = function ($el, options) {
   var fileBoxRemove = function (config) {
     // tigger remove callback
     if (typeof config.onRemove === 'function') {
-      config.onRemove();
+      config.onRemove(config);
     }
   };
 
@@ -242,7 +281,7 @@ export var filePicker = function ($el, options) {
     var $fileSelect = $filePicker.find('.fh-file-select');
     var $fileInputFake = $('<input>').attr({
       type: 'file',
-      accept: config.fileInput.accept,
+      accept: config.fileInput.accept.join(','),
       multiple: config.fileInput.multiple,
     });
 
@@ -253,13 +292,11 @@ export var filePicker = function ($el, options) {
 
     // fileInputFake change render
     $fileInputFake.on('change.formhelper', function () {
-      var files = $fileInputFake.prop('files');
-
       // if have select file
-      if (files.length > 0) {
+      if (this.files.length > 0) {
         // create new file box
         var newConfig = $.extend(true, {}, config, {
-          files: files,
+          files: this.files,
           $fileInput: $fileInputFake.clone(),
         });
 
@@ -291,9 +328,9 @@ export var filePicker = function ($el, options) {
     // fileInput change render
     $fileInput.on('change', function () {
       // if have select file
-      if ($fileInput.prop('files').length > 0) {
+      if (this.files.length > 0) {
         var newConfig = $.extend(true, {}, config, {
-          files: $fileInput.prop('files'),
+          files: this.files,
           $fileInput: $fileInput.clone(),
         });
 
@@ -302,12 +339,12 @@ export var filePicker = function ($el, options) {
         // tigger filePicker change
         filePickerChange(newConfig);
       } else {
+        // if not select files remove fileBox
+        $fileBox.remove();
         // tigger fileBox remove
         fileBoxRemove(config);
         // tigger filePicker change
         filePickerChange(config);
-        // if not select files remove fileBox
-        $fileBox.remove();
       }
     });
 
@@ -327,14 +364,25 @@ export var filePicker = function ($el, options) {
   };
 
   /**
+   * Build Exception message
+   *
+   * @param {String} code
+   * @param {String} param
+   */
+  var buildExceptionMsg = function (code, param) {
+    return (lang[code] || '').replace('{0}', code).replace('{1}', param);
+  };
+
+  /**
    * FilePicker Exception
    *
    * @param {String} code
+   * @param {String} param
    * @param {JQuery} $filePicker
    */
-  var filePickerException = function (code, $filePicker) {
+  var filePickerException = function (code, param, $filePicker) {
     this.code = code;
-    this.msg = lang[code] || '';
+    this.msg = buildExceptionMsg(code, param);
     this.$el = $filePicker || $el;
     this.api = this.$el.data('FilePicker') || {};
   };
@@ -348,6 +396,11 @@ export var filePicker = function ($el, options) {
     // init filePicker config
     config = $.extend(true, {}, options.filePicker, config);
 
+    // format fileInput accept type
+    config.fileInput.accept = Array.isArray(config.fileInput.accept)
+      ? config.fileInput.accept
+      : config.fileInput.accept.split(',');
+
     // set filePicker element
     config.$filePicker = getFilePickerTmpl(config);
 
@@ -356,6 +409,9 @@ export var filePicker = function ($el, options) {
 
     // set filePicker API
     config.api = {
+      getEl: function () {
+        return config.$filePicker;
+      },
       getSize: function (format = false) {
         var size = getFileSize(config.$filePicker);
         return format ? formatBytes(size) : size;
@@ -363,17 +419,22 @@ export var filePicker = function ($el, options) {
       getCount: function () {
         return getFileCount(config.$filePicker);
       },
+      getConfig: function () {
+        return config;
+      },
       addFileBox: function (fileBoxOpt = {}) {
-        var $fileBox = getFileBoxTmpl($.extend(true, {}, config, fileBoxOpt));
+        fileBoxOpt = $.extend(true, {}, config, fileBoxOpt);
+
+        var $fileBox = getFileBoxTmpl(fileBoxOpt);
 
         // insert into filePicker list block
         $fileList.append($fileBox);
 
         // tigger fileBox create
-        fileBoxCreate(newConfig);
+        fileBoxCreate(fileBoxOpt);
 
         // tigger filePicker change
-        filePickerChange(config);
+        filePickerChange(fileBoxOpt);
 
         return $fileBox;
       },
@@ -389,7 +450,7 @@ export var filePicker = function ($el, options) {
   /**
    * Get FilePicker info
    */
-  this.getAllInfo = function () {
+  this.getAllInfo = function ($ele) {
     var info = {
       size: 0,
       sizeHum: '',
@@ -397,11 +458,12 @@ export var filePicker = function ($el, options) {
       picker: [],
     };
 
-    $.each($el.find('.fh-file-picker'), function () {
+    $.each($ele.find('.fh-file-picker'), function () {
       let $filePicker = $(this);
+      let filePickerAPI = $filePicker.data('FilePicker');
 
       // continue undefined FilePicker
-      if (!$filePicker.data('FilePicker')) {
+      if (!filePickerAPI) {
         return;
       }
 
@@ -411,7 +473,7 @@ export var filePicker = function ($el, options) {
       info.size += size;
       info.count += count;
       info.picker.push({
-        $filePicker: $filePicker,
+        api: filePickerAPI,
         size: size,
         count: count,
       });
@@ -425,18 +487,28 @@ export var filePicker = function ($el, options) {
   /**
    * Check FilePicker limit
    */
-  this.check = function () {
-    var info = this.getAllInfo();
+  this.check = function ($ele) {
+    var info = this.getAllInfo($ele);
 
-    // check upload file size
-    if (info.totalSize > options.filePicker.maxBytes) {
-      throw new filePickerException('fileSizeOverload');
+    // check all upload file size
+    if (info.size > options.maxBytes) {
+      throw new filePickerException('fileSizeOverload', formatBytes(options.maxBytes), $ele);
     }
 
-    // check upload file count
+    // check all upload file count
+    if (info.count > options.maxFiles) {
+      throw new filePickerException('fileCountOverload', options.maxFiles, $ele);
+    }
+
     $.each(info.picker, function (idx, picker) {
-      if (picker.count > options.filePicker.maxFiles) {
-        throw new filePickerException('fileCountOverload', picker.$filePicker);
+      let pickerConfig = picker.api.getConfig();
+      // check picker upload file size
+      if (picker.size > pickerConfig.maxBytes) {
+        throw new filePickerException('fileSizeOverload', formatBytes(pickerConfig.maxBytes), picker.$filePicker);
+      }
+      // check picker upload file count
+      if (picker.count > pickerConfig.maxFiles) {
+        throw new filePickerException('fileCountOverload', pickerConfig.maxFiles, picker.$filePicker);
       }
     });
   };
