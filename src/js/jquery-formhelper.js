@@ -63,8 +63,6 @@ import { filePicker } from './lib/filePicker.js';
         // fail callback
         if (typeof options.onFail === 'function') {
           options.onFail(e);
-        } else {
-          throw e;
         }
         return false;
       }
