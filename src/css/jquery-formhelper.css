@@ -54,3 +54,7 @@ div.fh-file-box > div.fh-file-toolbar > span.fh-file-remove > i {
   color: red;
   cursor: pointer;
 }
+
+.fh-file-invalid {
+  background-color: #FCDEDE;
+}
