@@ -1,3 +1,5 @@
+import * as mine from './mineType.js';
+
 /**
  * FilePicker components
  *
@@ -8,6 +10,21 @@ export var filePicker = function ($el, options) {
   const kilobyte = 1024;
 
   const byteUnit = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const fileIcon = {
+    file: 'far fa-file',
+    image: 'far fa-file-image',
+    video: 'far fa-file-video',
+    audio: 'far fa-file-audio',
+    pdf: 'far fa-file-pdf',
+    csv: 'far fa-file-excel',
+    xml: 'far fa-file-excel',
+    word: 'far fa-file-word',
+    excel: 'far fa-file-excel',
+    powerpoint: 'far fa-file-powerpoint',
+    archive: 'far fa-file-archive',
+    code: 'far fa-file-code',
+  };
 
   var lang = options.language;
 
@@ -123,6 +140,7 @@ export var filePicker = function ($el, options) {
         $.each(config.files, function (idx, file) {
           let $fileInfo = $('<span>').addClass('fh-file-info').data(file);
           let fileText = `${file.name} (${formatBytes(file.size)})`;
+          let iconClass = fileIcon[mine.getType(file.name)] || fileIcon.file;
 
           // set download link
           if ('link' in file) {
@@ -131,7 +149,7 @@ export var filePicker = function ($el, options) {
             $fileInfo.text(fileText);
           }
 
-          $fileBox.append($fileInfo.prepend($('<i>').addClass('far fa-file fa-fw')));
+          $fileBox.append($fileInfo.prepend($('<i>').addClass(`${iconClass} fa-fw`)));
         });
       } else {
         // add selecting file prompt text
