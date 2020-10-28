@@ -38,13 +38,21 @@ export var filePicker = function ($el, options) {
     } else {
       var acceptTag = [];
       $.each(config.fileInput.accept, function (idx, accept) {
-        acceptTag.push($('<span>').addClass('fh-accept-tag').text(accept).prop('outerHTML'));
+        let tagText = accept.trim().replace(/^\./, '');
+        acceptTag.push($('<span>').addClass('fh-tag').text(tagText).prop('outerHTML'));
       });
 
-      var acceptMsg = acceptTag.length
-        ? $('<span>').text(lang.acceptMsg).prop('innerHTML').replace('{0}', acceptTag.join(''))
-        : '';
-      var limitMsg = lang.limitMsg.replace('{0}', formatBytes(config.maxBytes)).replace('{1}', config.maxFiles);
+      // if accept is not set display empty
+      var acceptMsg = $('<span>')
+        .text(acceptTag.length ? lang.acceptMsg : '')
+        .prop('innerHTML')
+        .replace('{0}', acceptTag.join(''));
+
+      var limitMsg = $('<span>')
+        .text(lang.limitMsg)
+        .prop('innerHTML')
+        .replace('{0}', $('<span>').addClass('fh-tag').text(formatBytes(config.maxBytes)).prop('outerHTML'))
+        .replace('{1}', $('<span>').addClass('fh-tag').text(config.maxFiles).prop('outerHTML'));
 
       $filePicker = $('<div>')
         .addClass('fh-file-picker')
@@ -58,7 +66,7 @@ export var filePicker = function ($el, options) {
           $('<div>')
             .addClass('fh-file-block')
             .append($('<span>').addClass('fh-file-accept').html(acceptMsg))
-            .append($('<span>').addClass('fh-file-limit').text(limitMsg))
+            .append($('<span>').addClass('fh-file-limit').html(limitMsg))
             .append($('<span>').addClass('fh-file-unselect').text(lang.unselectFile))
             .append($('<div>').addClass('fh-file-list'))
         )
