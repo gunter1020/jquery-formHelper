@@ -1,7 +1,10 @@
 import { filePicker } from './lib/filePicker.js';
 
-/**
+/*!
  * Form components
+ *
+ * Copyright(c) 2020 Gunter.Chou
+ * MIT Licensed
  */
 (function (factory) {
   if (!$) {
