@@ -474,6 +474,26 @@ export var filePicker = function ($el, options) {
   };
 
   /**
+   * Add FileList
+   *
+   * @param {*} config
+   */
+  this.addList = function (config = {}) {
+    var filePickerAPI = this.addPicker(config);
+    var removeBlock = [
+      '.fh-file-select',
+      '.fh-file-limit',
+      '.fh-file-accept',
+      '.fh-file-unselect',
+      '.fh-file-msg',
+    ].join(',');
+
+    filePickerAPI.getEl().find(removeBlock).remove();
+
+    return filePickerAPI;
+  };
+
+  /**
    * Get FilePicker info
    */
   this.getAllInfo = function ($ele) {
