@@ -38,6 +38,16 @@ import { filePicker } from './lib/filePicker.js';
     };
 
     /**
+     * Add FileList
+     *
+     * @param {*} config
+     * @returns {JQuery}
+     */
+    helper.addFileList = function (config = {}) {
+      return components.filePicker.addList(config);
+    };
+
+    /**
      * Get FilePicker info
      *
      * @param {Element} ele
