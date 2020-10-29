@@ -8,13 +8,15 @@ div.fh-file-box > span.fh-file-info {
   display: block;
 }
 
-div.fh-file-block > .fh-file-accept > .fh-accept-tag {
+div.fh-file-block > .fh-file-limit > .fh-tag,
+div.fh-file-block > .fh-file-accept > .fh-tag {
   display: inline-block;
   white-space: nowrap;
   vertical-align: baseline;
   text-align: center;
   margin: 0rem 0.1rem;
-  padding: 0rem .25rem;
+  padding: 0.15rem .25rem;
+  line-height: 1;
   border-radius: .25rem;
   font-size: .75rem;
   font-weight: bold;

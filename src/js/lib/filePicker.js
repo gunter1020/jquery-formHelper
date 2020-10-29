@@ -1,3 +1,5 @@
+import * as mine from './mineType.js';
+
 /**
  * FilePicker components
  *
@@ -8,6 +10,21 @@ export var filePicker = function ($el, options) {
   const kilobyte = 1024;
 
   const byteUnit = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const fileIcon = {
+    file: 'far fa-file',
+    image: 'far fa-file-image',
+    video: 'far fa-file-video',
+    audio: 'far fa-file-audio',
+    pdf: 'far fa-file-pdf',
+    csv: 'far fa-file-excel',
+    xml: 'far fa-file-excel',
+    word: 'far fa-file-word',
+    excel: 'far fa-file-excel',
+    powerpoint: 'far fa-file-powerpoint',
+    archive: 'far fa-file-archive',
+    code: 'far fa-file-code',
+  };
 
   var lang = options.language;
 
@@ -38,13 +55,21 @@ export var filePicker = function ($el, options) {
     } else {
       var acceptTag = [];
       $.each(config.fileInput.accept, function (idx, accept) {
-        acceptTag.push($('<span>').addClass('fh-accept-tag').text(accept).prop('outerHTML'));
+        let tagText = accept.trim().replace(/^\./, '');
+        acceptTag.push($('<span>').addClass('fh-tag').text(tagText).prop('outerHTML'));
       });
 
-      var acceptMsg = acceptTag.length
-        ? $('<span>').text(lang.acceptMsg).prop('innerHTML').replace('{0}', acceptTag.join(''))
-        : '';
-      var limitMsg = lang.limitMsg.replace('{0}', formatBytes(config.maxBytes)).replace('{1}', config.maxFiles);
+      // if accept is not set display empty
+      var acceptMsg = $('<span>')
+        .text(acceptTag.length ? lang.acceptMsg : '')
+        .prop('innerHTML')
+        .replace('{0}', acceptTag.join(''));
+
+      var limitMsg = $('<span>')
+        .text(lang.limitMsg)
+        .prop('innerHTML')
+        .replace('{0}', $('<span>').addClass('fh-tag').text(formatBytes(config.maxBytes)).prop('outerHTML'))
+        .replace('{1}', $('<span>').addClass('fh-tag').text(config.maxFiles).prop('outerHTML'));
 
       $filePicker = $('<div>')
         .addClass('fh-file-picker')
@@ -58,7 +83,7 @@ export var filePicker = function ($el, options) {
           $('<div>')
             .addClass('fh-file-block')
             .append($('<span>').addClass('fh-file-accept').html(acceptMsg))
-            .append($('<span>').addClass('fh-file-limit').text(limitMsg))
+            .append($('<span>').addClass('fh-file-limit').html(limitMsg))
             .append($('<span>').addClass('fh-file-unselect').text(lang.unselectFile))
             .append($('<div>').addClass('fh-file-list'))
         )
@@ -115,6 +140,7 @@ export var filePicker = function ($el, options) {
         $.each(config.files, function (idx, file) {
           let $fileInfo = $('<span>').addClass('fh-file-info').data(file);
           let fileText = `${file.name} (${formatBytes(file.size)})`;
+          let iconClass = fileIcon[mine.getType(file.name)] || fileIcon.file;
 
           // set download link
           if ('link' in file) {
@@ -123,7 +149,7 @@ export var filePicker = function ($el, options) {
             $fileInfo.text(fileText);
           }
 
-          $fileBox.append($fileInfo.prepend($('<i>').addClass('far fa-file fa-fw')));
+          $fileBox.append($fileInfo.prepend($('<i>').addClass(`${iconClass} fa-fw`)));
         });
       } else {
         // add selecting file prompt text
