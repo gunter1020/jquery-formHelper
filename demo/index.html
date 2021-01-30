@@ -15,8 +15,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
     <!-- formhelper -->
-    <link rel="stylesheet" href="../dist/css/jquery-formhelper.min.css" />
-    <script type="text/javascript" src="../dist/js/jquery-formhelper.min.js"></script>
+    <link rel="stylesheet" href="/dist/css/jquery-formhelper.min.css" />
+    <script type="text/javascript" src="/dist/js/jquery-formhelper.min.js" defer></script>
 
     <style>
       .ctrl-demo {
@@ -51,6 +51,7 @@
         var fileDemo2 = formhelper.addFilePicker({
           canRemove: false,
           canModify: true,
+          canDragDrop: true,
           fileInput: {
             name: 'fileDemo2[]',
             accept: ['image/*', '.pdf', '.doc', '.docx', '.xml', 'application/msword'],

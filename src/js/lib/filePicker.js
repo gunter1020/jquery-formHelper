@@ -1,5 +1,7 @@
 import * as mine from './mineType.js';
 
+const dragDrop = require('drag-drop');
+
 /**
  * FilePicker components
  *
@@ -311,6 +313,23 @@ export var filePicker = function ($el, options) {
       multiple: config.fileInput.multiple,
     });
 
+    // add file action
+    var addFileAction = function (files) {
+      // create new file box
+      var newConfig = $.extend(true, {}, config, {
+        files: files,
+        $fileInput: $fileInputFake.clone(),
+      });
+
+      $fileList.append(getFileBoxTmpl(newConfig));
+
+      // tigger fileBox create
+      fileBoxCreate(newConfig);
+
+      // tigger filePicker change
+      filePickerChange(newConfig);
+    };
+
     // create fileBox & trigger file select filePicker
     $fileSelect.on('click', function () {
       $fileInputFake.trigger('click');
@@ -320,24 +339,37 @@ export var filePicker = function ($el, options) {
     $fileInputFake.on('change.formhelper', function () {
       // if have select file
       if (this.files.length > 0) {
-        // create new file box
-        var newConfig = $.extend(true, {}, config, {
-          files: this.files,
-          $fileInput: $fileInputFake.clone(),
-        });
-
-        $fileList.append(getFileBoxTmpl(newConfig));
-
-        // tigger fileBox create
-        fileBoxCreate(newConfig);
-
-        // tigger filePicker change
-        filePickerChange(newConfig);
+        addFileAction(this.files);
       }
 
       // reset fileInputFake
       $fileInputFake.prop('type', '').prop('type', 'file');
     });
+
+    if (config.canDragDrop) {
+      let dragDropArea = $filePicker;
+
+      // set filePicker dragDropArea
+      if (typeof config.dragDropArea === 'string') {
+        dragDropArea = $(config.dragDropArea);
+      } else if (config.dragDropArea instanceof jQuery) {
+        dragDropArea = config.dragDropArea;
+      }
+
+      // filePicker drag & drop event
+      config.offDragDrop = dragDrop(dragDropArea.get(0), {
+        onDrop: function (files, pos, fileList, directories) {
+          addFileAction(files);
+          // tigger onDrop callback
+          if (typeof config.onDrop === 'function') {
+            config.onDrop(config, files, pos, fileList, directories);
+          }
+        },
+        onDragEnter: function (e) {},
+        onDragOver: function (e) {},
+        onDragLeave: function (e) {}
+      });
+    }
   };
 
   /**
