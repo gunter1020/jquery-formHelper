@@ -144,7 +144,7 @@ export var filePicker = function ($el, options) {
 
           // set download link
           if ('link' in file) {
-            $fileInfo.append($('<a>').attr({ href: file.link, target: '_blank' }).text(fileText));
+            $fileInfo.append($('<a>').attr({ href: file.link, target: '_blank', rel: 'noopener/noreferrer' }).text(fileText));
           } else {
             $fileInfo.text(fileText);
           }
@@ -419,8 +419,18 @@ export var filePicker = function ($el, options) {
    * @param {*} config
    */
   this.addPicker = function (config = {}) {
+    // filePicker append target
+    var targetEl = $el;
+
     // init filePicker config
     config = $.extend(true, {}, options.filePicker, config);
+
+    // set filePicker append target
+    if (typeof config.container === 'string') {
+      targetEl = $(config.container);
+    } else if (config.container instanceof jQuery) {
+      targetEl = config.container;
+    }
 
     // format fileInput accept type
     config.fileInput.accept = Array.isArray(config.fileInput.accept)
@@ -468,7 +478,7 @@ export var filePicker = function ($el, options) {
 
     config.$filePicker.data('FilePicker', config.api);
 
-    $(config.container || $el).append(config.$filePicker);
+    config.$filePicker.appendTo(targetEl);
 
     return config.api;
   };
