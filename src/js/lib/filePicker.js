@@ -144,7 +144,7 @@ export var filePicker = function ($el, options) {
 
           // set download link
           if ('link' in file) {
-            $fileInfo.append($('<a>').attr({ href: file.link, target: '_blank' }).text(fileText));
+            $fileInfo.append($('<a>').attr({ href: file.link, target: '_blank', rel: 'noopener/noreferrer' }).text(fileText));
           } else {
             $fileInfo.text(fileText);
           }
