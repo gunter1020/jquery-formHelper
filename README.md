@@ -133,6 +133,6 @@ $(function () {
 git clone git://github.com/gunter1020/jquery-formHelper.git
 cd jquery-formHelper
 npm install
-npm install -g grunt-cli
 npm run build
+npm run serve
 ```
