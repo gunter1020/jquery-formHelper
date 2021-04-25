@@ -205,7 +205,7 @@ export var filePicker = function ($el, options) {
     var fileSize = 0;
 
     $.each(getFileInfo($filePicker), function (idx, file) {
-      fileSize = fileSize + file.size;
+      fileSize = fileSize + parseInt(file.size);
     });
 
     return fileSize;
