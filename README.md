@@ -130,9 +130,16 @@ $(function () {
 ## Installation compile kit (option)
 
 ```bash
+# Init development environment
 git clone git://github.com/gunter1020/jquery-formHelper.git
 cd jquery-formHelper
 npm install
+
+# Build dist file
+npm install -g grunt-cli
 npm run build
+
+# Start demo site
+npm install -g http-server
 npm run serve
 ```
