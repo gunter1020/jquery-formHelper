@@ -27,7 +27,6 @@
     "mime-types": "^2.1.28"
   },
   "scripts": {
-    "postinstall": "npm install -g grunt-cli http-server",
     "serve": "http-server -d false -c-1 -o demo",
     "build": "grunt release"
   },
