@@ -506,6 +506,10 @@ export var filePicker = function ($el, options) {
 
         return $fileBox;
       },
+      triggerFilePickerChange: function (fileBoxOpt = {}) {
+        // tigger filePicker change
+        filePickerChange($.extend(true, {}, config, fileBoxOpt));
+      }
     };
 
     config.$filePicker.data('FilePicker', config.api);
