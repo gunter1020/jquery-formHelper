@@ -115,21 +115,6 @@ export var filePicker = function ($el, options) {
 
       $fileBox = $('<div>').addClass('fh-file-box');
 
-      // add file input
-      if (config.$fileInput) {
-        $fileBox.append(
-          config.$fileInput
-            .attr({
-              type: 'file',
-              name: config.fileInput.name,
-              accept: config.fileInput.accept.join(','),
-              multiple: config.fileInput.multiple,
-            })
-            .addClass('fh-file-input')
-            .hide()
-        );
-      }
-
       if (config.inputs) {
         // add hidden input
         $.each(config.inputs, function (idx, input) {
@@ -140,9 +125,15 @@ export var filePicker = function ($el, options) {
       if (config.files && config.files.length) {
         // add select files info text
         $.each(config.files, function (idx, file) {
-          let $fileInfo = $('<span>').addClass('fh-file-info').data(file);
+          let $fileInfo = $('<span>').addClass('fh-file-info');
           let fileText = `${file.name} (${formatBytes(file.size)})`;
           let iconClass = fileIcon[mine.getType(file.name)] || fileIcon.file;
+
+          // set file formdata
+          $fileInfo.data({
+            name: config.fileInput.name,
+            file: file,
+          });
 
           // set download link
           if ('link' in file) {
@@ -159,7 +150,7 @@ export var filePicker = function ($el, options) {
       }
 
       // create modify icon
-      if (config.canModify && config.$fileInput) {
+      if (config.canModify) {
         toolbar.push($('<span>').addClass('fh-file-modify').append($('<i>').addClass('fas fa-pen fa-fw')));
       }
 
@@ -189,7 +180,7 @@ export var filePicker = function ($el, options) {
     var files = [];
 
     $.each($filePicker.find('.fh-file-info'), function () {
-      files.push($(this).data());
+      files.push($(this).data('file'));
     });
 
     return files;
@@ -316,12 +307,18 @@ export var filePicker = function ($el, options) {
     // add file action
     var addFileAction = function (files) {
       // create new file box
-      var newConfig = $.extend(true, {}, config, {
-        files: files,
-        $fileInput: $fileInputFake.clone(),
-      });
+      var newConfig = $.extend(true, {}, config);
 
-      $fileList.append(getFileBoxTmpl(newConfig));
+      // each select files
+      $.each(files, function (idx, file) {
+        // set one files into config
+        newConfig.files = [file];
+        // append filebox into filelist area
+        $fileList.append(getFileBoxTmpl(newConfig));
+      })
+
+      // set all files into config
+      newConfig.files = files;
 
       // tigger fileBox create
       fileBoxCreate(newConfig);
@@ -379,23 +376,28 @@ export var filePicker = function ($el, options) {
    * @param {*} config
    */
   var bindFileBoxEvent = function ($fileBox, config) {
-    var $fileInput = $fileBox.find('.fh-file-input');
     var $modifyIcon = $fileBox.find('.fh-file-modify');
     var $removeIcon = $fileBox.find('.fh-file-remove');
+    var $fileInputFake = $('<input>').attr({
+      type: 'file',
+      accept: config.fileInput.accept.join(','),
+      multiple: false,
+    });
 
     // fileInput change render
-    $fileInput.on('change', function () {
+    $fileInputFake.on('change', function () {
       // if have select file
       if (this.files.length > 0) {
-        var newConfig = $.extend(true, {}, config, {
-          files: this.files,
-          $fileInput: $fileInput.clone(),
-        });
+        var newConfig = $.extend(true, {}, config);
 
+        // set files into config
+        newConfig.files = this.files;
         // insert new fileBox after ori fileBox
         $fileBox.after(getFileBoxTmpl(newConfig)).remove();
         // tigger filePicker change
         filePickerChange(newConfig);
+        // reset fileInputFake
+        $fileInputFake.prop('type', '').prop('type', 'file');
       } else {
         // if not select files remove fileBox
         $fileBox.remove();
@@ -403,12 +405,14 @@ export var filePicker = function ($el, options) {
         fileBoxRemove(config);
         // tigger filePicker change
         filePickerChange(config);
+        // unset fileInputFake
+        $fileInputFake = undefined;
       }
     });
 
     // modify fileBox
     $modifyIcon.on('click', function () {
-      $fileInput.trigger('click');
+      $fileInputFake.trigger('click');
     });
 
     // remove fileBox

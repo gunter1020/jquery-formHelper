@@ -99,6 +99,20 @@ import { filePicker } from './lib/filePicker.js';
         // init FormData
         var formData = $formEle.is('form') ? new FormData($formEle.get(0)) : new FormData();
 
+        // append file blob
+        $formEle
+          .find('.fh-file-info')
+          .each(function (idx, el) {
+            let $el = $(el);
+            let filename = $el.data('name');
+            let fileblob = $el.data('file');
+
+            // check file is vaild
+            if (filename && fileblob) {
+              formData.append(filename, fileblob);
+            }
+          });
+
         // append custom data
         if (!$.isEmptyObject(data)) {
           $.each(data, function (name, value) {
