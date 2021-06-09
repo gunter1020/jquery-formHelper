@@ -126,8 +126,13 @@ export var filePicker = function ($el, options) {
         // add select files info text
         $.each(config.files, function (idx, file) {
           let $fileInfo = $('<span>').addClass('fh-file-info');
-          let fileText = `${file.name} (${formatBytes(file.size)})`;
           let iconClass = fileIcon[mine.getType(file.name)] || fileIcon.file;
+          let fileText = file.name;
+
+          // show file size
+          if (config.showFileSize) {
+            fileText = `${fileText} (${formatBytes(file.size)})`;
+          }
 
           // set file formdata
           $fileInfo.data({
