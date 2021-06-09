@@ -178,6 +178,7 @@ import { filePicker } from './lib/filePicker.js';
       canRemove: true,
       canModify: true,
       canDragDrop: false,
+      showFileSize: true,
       dragDropArea: false,
       container: false,
       maxBytes: 10 * 1024 * 1024,

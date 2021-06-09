@@ -73,6 +73,7 @@ $(function () {
     maxFiles: 10,
     canRemove: true,
     canModify: true,
+    showFileSize: true,
     fileInput: {
       name: 'fileDemo[]',
       accept: ['image/*', '.pdf'],
