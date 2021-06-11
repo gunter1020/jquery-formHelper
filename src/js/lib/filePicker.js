@@ -89,7 +89,7 @@ export var filePicker = function ($el, options) {
             .append($('<span>').addClass('fh-file-unselect').text(lang.unselectFile))
             .append($('<div>').addClass('fh-file-list'))
         )
-        .append($('<div>').addClass('fh-file-msg'));
+        .append($('<div>').addClass('fh-file-msg').hide());
     }
 
     bindFilePickerEvent($filePicker, config);
@@ -246,7 +246,7 @@ export var filePicker = function ($el, options) {
     $fileSelect.attr('disabled', fileSelectDisable);
 
     // clean filePicker invalid message
-    $fileMsg.empty();
+    $fileMsg.empty().hide();
 
     // add file size invalid message
     if (isOverSize) {
@@ -254,14 +254,14 @@ export var filePicker = function ($el, options) {
         $('<div>')
           .addClass('fh-file-invalid')
           .text(buildExceptionMsg('fileSizeOverload', formatBytes(config.maxBytes)))
-      );
+      ).show();
     }
 
     // add file count invalid message
     if (isOverLoad) {
       $fileMsg.append(
         $('<div>').addClass('fh-file-invalid').text(buildExceptionMsg('fileCountOverload', config.maxFiles))
-      );
+      ).show();
     }
 
     // tigger change callback
